@@ -1,6 +1,8 @@
 import logging
 from logging import Formatter
 from logging.handlers import RotatingFileHandler
+from shutil import copyfile
+
 
 import gin
 
@@ -51,6 +53,8 @@ def process_gin_config(config_file, gin_kwargs: dict):
         CHECKPOINTS_DIR_GIN_MACRO_NAME: checkpoints_dir,
         TBOARD_DIR_GIN_MACRO_NAME: summary_dir,
     })
+    # copy the gin config file into the current run's directory
+    copyfile(config_file, checkpoints_dir / 'config.gin')
 
     # setup logging in the project
     setup_logging(log_dir)
