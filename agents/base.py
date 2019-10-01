@@ -128,6 +128,11 @@ class BaseTrainAgent(BaseAgent):
             log_dir=module_dirs.get_current_tboard_dir(),
             comment=self.agent_name,
         )
+        # add config string to summary
+        config_str = gin.config_str()
+        # see https://stackoverflow.com/questions/45016458/tensorflow-tf-summary-text-and-linebreaks
+        config_str = config_str.replace('\n', '  \n')
+        self.summary_writer.add_text(tag='gin_config', text_string=config_str)
 
     def _get_state_dict(self):
         state_dict = super()._get_state_dict()
