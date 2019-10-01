@@ -3,11 +3,14 @@ The Base Agent class, where all other agents inherit from, that contains definit
 """
 import logging
 
+import gin
 import torch
 from torch.utils.tensorboard import SummaryWriter
 import numpy as np
 
-from utils.misc import print_cuda_statistics
+from graphs.optimizers import sgd
+from utils.devices import configure_device
+import utils.dirs as module_dirs
 
 
 class BaseAgent:
@@ -15,14 +18,13 @@ class BaseAgent:
     This base class will contain the base functions to be overloaded by any agent you will implement.
     """
 
-    def __init__(self, config):
-        self.config = config
+    def __init__(self):
         self.logger = logging.getLogger("Agent")
         self.agent_name = 'Base'
 
     def _get_state_dict(self):
         return {
-            'config': self.config,
+            # TODO dump config here
         }
 
     def load_checkpoint(self, file_name):
@@ -78,24 +80,31 @@ class BaseAgent:
 
     @property
     def debug(self):
-        return self.config.debug
+        return gin.query_parameter('%debug')
 
 
+@gin.configurable
 class BaseTrainAgent(BaseAgent):
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(
+            self,
+            max_epoch,
+            log_interval=10,
+            checkpoint_path=None,
+    ):
+        super().__init__()
+
+        self.agent_name = 'BaseTrainAgent'
+        self.max_epoch = max_epoch
+        self.log_interval = log_interval
 
         self._init_counters()
         self._init_model()
         self._init_optimizer()
         self._init_data_loader()
-        self._init_device(use_cuda=self.config.cuda)
-        self.set_random_seed(seed=self.config.seed)
+        self._init_device()
+        self._init_tboard_logging()
 
-        # load model from the latest checkpoint - if not specified start from scratch.
-        self.load_checkpoint(self._checkpoint_path)
-        # init SummaryWriter for tensorboard logging
-        self.summary_writer = SummaryWriter(log_dir=self.config.summary_dir, comment=self.agent_name)
+        self.load_checkpoint(checkpoint_path)
 
     def _init_counters(self):
         self.current_epoch = 0
@@ -105,43 +114,20 @@ class BaseTrainAgent(BaseAgent):
         raise NotImplementedError()
 
     def _init_optimizer(self):
-        raise NotImplementedError()
+        self.optimizer = sgd(params=self.model.parameters())
 
     def _init_data_loader(self):
         raise NotImplementedError()
 
-    def _init_device(self, use_cuda=True):
-        cuda_available = torch.cuda.is_available()
-        if cuda_available and not use_cuda:
-            self.logger.info("WARNING: You have a CUDA device, but chose not to use it.")
-
-        self.cuda = cuda_available & use_cuda
-
-        if self.cuda:
-            self.device = torch.device("cuda")
-            torch.cuda.set_device(self.config.gpu_device)
-            self.logger.info("Program will run on *****GPU-CUDA***** ")
-            print_cuda_statistics()
-        else:
-            self.device = torch.device("cpu")
-            self.logger.info("Program will run on *****CPU*****\n")
-
+    def _init_device(self):
+        self.device = configure_device()
         self.model = self.model.to(self.device)
 
-    def set_random_seed(self, seed=None):
-        """
-        See https://pytorch.org/docs/stable/notes/randomness.html
-        and https://stackoverflow.com/questions/55097671/how-to-save-and-load-random-number-generator-state-in-pytorch
-        """
-        self.manual_seed = seed
-
-        if self.manual_seed is not None:
-            torch.manual_seed(self.manual_seed)
-            np.random.seed(self.manual_seed)
-
-            if self.cuda:
-                torch.backends.cudnn.deterministic = True
-                torch.backends.cudnn.benchmark = False
+    def _init_tboard_logging(self):
+        self.summary_writer = SummaryWriter(
+            log_dir=module_dirs.get_current_tboard_dir(),
+            comment=self.agent_name,
+        )
 
     def _get_state_dict(self):
         state_dict = super()._get_state_dict()
@@ -167,28 +153,31 @@ class BaseTrainAgent(BaseAgent):
         np.random.set_state(state_dict['numpy_random_state'])
 
     @property
-    def _checkpoint_path(self):
-        return getattr(self.config, 'checkpoint_file', None)
+    def checkpoints_dir(self):
+        return module_dirs.get_current_checkpoints_dir()
+
+    @property
+    def experiments_dir(self):
+        # checkpoint_dir is of structure .../exp_name/datetime_str/
+        # and we will look for the checkpoint file under a different timestamp
+        return self.checkpoints_dir.parent
 
     def load_checkpoint(self, file_name=None):
         """
-        Latest checkpoint loader
+        Load model from the latest checkpoint - if not specified start from scratch.
         :param file_name: name of the checkpoint file
         :return:
         """
         if file_name is not None and len(file_name) > 0:
-            # select the experiment directory - checkpoint_dir is of structure .../exp_name/datetime_str/
-            # and we will look for the checkpoint file under a different timestamp
-            checkpoint_path = self.config.checkpoint_dir.parent
-            checkpoint_path /= file_name
+            checkpoint_path = self.experiments_dir / file_name
 
             self.logger.info(f'Loading checkpoint "{checkpoint_path}"')
-            checkpoint = torch.load(checkpoint_path)
 
+            checkpoint = torch.load(checkpoint_path)
             self._load_state_dict(checkpoint)
 
             self.logger.info(
-                f"""Checkpoint loaded successfully from '{self.config.checkpoint_dir}' at (epoch {checkpoint['epoch']}) 
+                f"""Checkpoint loaded successfully from '{checkpoint_path}' at (epoch {checkpoint['epoch']}) 
                 at (iteration {checkpoint['iteration']})\n""")
 
     def save_checkpoint(self, is_best=False):
@@ -197,10 +186,10 @@ class BaseTrainAgent(BaseAgent):
         :param is_best: boolean flag to indicate whether current checkpoint's accuracy is the best so far
         :return:
         """
-        checkpoint_path = self.config.checkpoint_dir / f'epoch_{self.current_epoch}.pth'
+        checkpoint_path = self.checkpoints_dir / f'epoch_{self.current_epoch}.pth'
         torch.save(self._get_state_dict(), checkpoint_path)
         if is_best:
-            best_checkpoint_path = self.config.checkpoint_dir / 'best.pth'
+            best_checkpoint_path = self.checkpoints_dir / 'best.pth'
             torch.save(self._get_state_dict(), best_checkpoint_path)
 
     def run(self):
@@ -218,7 +207,7 @@ class BaseTrainAgent(BaseAgent):
         Main training loop
         :return:
         """
-        for epoch in range(self.current_epoch, self.config.max_epoch):
+        for epoch in range(self.current_epoch, self.max_epoch):
             self.train_one_epoch()
             self.validate()
             self.save_checkpoint()
@@ -257,7 +246,7 @@ class BaseTrainAgent(BaseAgent):
             loss.backward()
             self.optimizer.step()
 
-            if batch_idx % self.config.log_interval == 0:
+            if batch_idx % self.log_interval == 0:
                 loss_val = loss.item()
                 self._log_train_iter(batch_idx=batch_idx, loss_val=loss_val)
 
@@ -273,7 +262,6 @@ class BaseTrainAgent(BaseAgent):
         """
         self.model.eval()
         val_loss = 0
-        correct = 0
         with torch.no_grad():
             for data, target in self.data_loader.val_loader:
                 data, target = data.to(self.device), target.to(self.device)
@@ -286,7 +274,7 @@ class BaseTrainAgent(BaseAgent):
 
         val_loss /= len(self.data_loader.val_loader.dataset)
 
-        self.logger.info(f'\nValidation set: Average loss: {val_loss:.4f}n')
+        self.logger.info(f'\nValidation set: Average loss: {val_loss:.4f}')
 
         # log to tensorboard
         self.summary_writer.add_scalar(
