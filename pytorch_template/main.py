@@ -14,8 +14,8 @@ from pytorch_template.utils.config import process_gin_config
 
 
 @gin.configurable
-def make_agent(agent_name, agents_module=base_agents_module):
-    agent_class = getattr(agents_module, agent_name)
+def make_agent(agent_name, agents_module):
+    agent_class = getattr(agents_module or base_agents_module, agent_name)
     agent = agent_class()
 
     return agent
