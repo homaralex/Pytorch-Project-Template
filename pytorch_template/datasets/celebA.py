@@ -1,16 +1,12 @@
 """
 CelebA Dataloader implementation, used in DCGAN
 """
-import numpy as np
 
 import imageio
-
-import torch
+import torchvision.datasets as v_datasets
 import torchvision.transforms as v_transforms
 import torchvision.utils as v_utils
-import torchvision.datasets as v_datasets
-
-from torch.utils.data import DataLoader, TensorDataset, Dataset
+from torch.utils.data import DataLoader
 
 
 class CelebADataLoader:

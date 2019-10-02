@@ -2,7 +2,6 @@
 Binary Cross Entropy for DCGAN
 """
 
-import torch
 import torch.nn as nn
 
 

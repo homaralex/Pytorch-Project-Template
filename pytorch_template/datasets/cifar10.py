@@ -2,14 +2,12 @@
 Cifar10 Dataloader implementation, used in CondenseNet
 """
 import logging
+
 import numpy as np
-
 import torch
-import torchvision.transforms as v_transforms
-import torchvision.utils as v_utils
 import torchvision.datasets as v_datasets
-
-from torch.utils.data import DataLoader, TensorDataset, Dataset
+import torchvision.transforms as v_transforms
+from torch.utils.data import DataLoader, TensorDataset
 
 
 class Cifar10DataLoader:
@@ -20,20 +18,20 @@ class Cifar10DataLoader:
 
             self.logger.info("Loading DATA.....")
             normalize = v_transforms.Normalize(mean=[0.4914, 0.4824, 0.4467],
-                                             std=[0.2471, 0.2435, 0.2616])
+                                               std=[0.2471, 0.2435, 0.2616])
 
             train_set = v_datasets.CIFAR10('./data', train=True, download=True,
-                                         transform=v_transforms.Compose([
-                                             v_transforms.RandomCrop(32, padding=4),
-                                             v_transforms.RandomHorizontalFlip(),
-                                             v_transforms.ToTensor(),
-                                             normalize,
-                                         ]))
+                                           transform=v_transforms.Compose([
+                                               v_transforms.RandomCrop(32, padding=4),
+                                               v_transforms.RandomHorizontalFlip(),
+                                               v_transforms.ToTensor(),
+                                               normalize,
+                                           ]))
             valid_set = v_datasets.CIFAR10('./data', train=False,
-                                       transform=v_transforms.Compose([
-                                           v_transforms.ToTensor(),
-                                           normalize,
-                                       ]))
+                                           transform=v_transforms.Compose([
+                                               v_transforms.ToTensor(),
+                                               normalize,
+                                           ]))
 
             self.train_loader = DataLoader(train_set, batch_size=self.config.batch_size, shuffle=True)
             self.valid_loader = DataLoader(valid_set, batch_size=self.config.batch_size, shuffle=False)
@@ -62,7 +60,8 @@ class Cifar10DataLoader:
             self.test_loader = DataLoader(test, batch_size=config.batch_size, shuffle=False)
 
         elif config.data_mode == "random":
-            train_data = torch.randn(self.config.batch_size, self.config.input_channels, self.config.img_size, self.config.img_size)
+            train_data = torch.randn(self.config.batch_size, self.config.input_channels, self.config.img_size,
+                                     self.config.img_size)
             train_labels = torch.ones(self.config.batch_size).long()
             valid_data = train_data
             valid_labels = train_labels

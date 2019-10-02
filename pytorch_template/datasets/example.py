@@ -4,7 +4,7 @@ An example for dataset loaders, starting with data loading including all the fun
 import imageio
 import torch
 import torchvision.utils as v_utils
-from torch.utils.data import DataLoader, TensorDataset, Dataset
+from torch.utils.data import DataLoader, TensorDataset
 
 
 class ExampleDataLoader:
@@ -20,7 +20,8 @@ class ExampleDataLoader:
             raise NotImplementedError("This mode is not implemented YET")
 
         elif config.data_mode == "random":
-            train_data = torch.randn(self.config.batch_size, self.config.input_channels, self.config.img_size, self.config.img_size)
+            train_data = torch.randn(self.config.batch_size, self.config.input_channels, self.config.img_size,
+                                     self.config.img_size)
             train_labels = torch.ones(self.config.batch_size).long()
             valid_data = train_data
             valid_labels = train_labels
@@ -72,4 +73,3 @@ class ExampleDataLoader:
 
     def finalize(self):
         pass
-

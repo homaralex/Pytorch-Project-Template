@@ -1,8 +1,8 @@
 import logging
 
 import gin
-import torch
 import numpy as np
+import torch
 
 from pytorch_template.utils.misc import print_cuda_statistics
 

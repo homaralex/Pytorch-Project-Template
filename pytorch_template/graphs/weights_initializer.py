@@ -1,8 +1,9 @@
 """
 A file for all models' weight initialization functions
 """
-from torch import nn
 import math
+
+from torch import nn
 
 
 def weights_init(m):

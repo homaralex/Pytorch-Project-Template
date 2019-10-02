@@ -4,13 +4,13 @@ The Base Agent class, where all other agents inherit from, that contains definit
 import logging
 
 import gin
+import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
-import numpy as np
 
 from pytorch_template.graphs.optimizers import sgd
-from pytorch_template.utils.devices import configure_device
 from pytorch_template.utils import dirs as module_dirs
+from pytorch_template.utils.devices import configure_device
 
 
 class BaseAgent:
