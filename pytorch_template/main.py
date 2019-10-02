@@ -9,8 +9,8 @@ import argparse
 
 import gin
 
-from utils.config import process_gin_config
-import agents as agents_module
+from pytorch_template.utils.config import process_gin_config
+from pytorch_template import agents as agents_module
 
 
 @gin.configurable
