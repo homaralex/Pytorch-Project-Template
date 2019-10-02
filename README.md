@@ -5,6 +5,7 @@ README.
 
 Main changes:
  * [gin](https://github.com/google/gin-config) configs instead of json
+ * can be installed as an external library allowing code like `from pytorch_template.main import main; main()`
  * removed all examples except MNIST; removed tutorials
  * refactored some of the existing code
  * some small functionalities added, e.g. saving experiment state (config files, archive of the current repo state) on each run
