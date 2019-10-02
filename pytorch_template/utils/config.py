@@ -5,8 +5,8 @@ from shutil import copyfile
 
 import gin
 
-from utils.dirs import make_exp_dirs, CHECKPOINTS_DIR_GIN_MACRO_NAME, TBOARD_DIR_GIN_MACRO_NAME
-from utils.repo import save_repo_archive
+from pytorch_template.utils.dirs import make_exp_dirs, CHECKPOINTS_DIR_GIN_MACRO_NAME, TBOARD_DIR_GIN_MACRO_NAME
+from pytorch_template.utils.repo import save_repo_archive
 
 
 def setup_logging(log_dir):

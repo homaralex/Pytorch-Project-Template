@@ -2,7 +2,7 @@ from pathlib import Path
 
 import gin
 
-from utils.misc import get_datetime_str
+from pytorch_template.utils.misc import get_datetime_str
 
 _TBOARD_PATH = Path('tboard_logs')
 _EXPERIMENTS_PATH = Path('experiments')

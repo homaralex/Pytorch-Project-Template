@@ -6,5 +6,5 @@
 #export CUDA_DEVICE_ORDER=PCI_BUS_ID
 #export CUDA_VISIBLE_DEVICES=1
 
-python main.py configs/mnist_exp_0.gin
+python pytorch_template/main.py pytorch_template/configs/mnist_exp_0.gin
 

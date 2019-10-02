@@ -4,7 +4,7 @@ import gin
 import torch
 import numpy as np
 
-from utils.misc import print_cuda_statistics
+from pytorch_template.utils.misc import print_cuda_statistics
 
 logger = logging.getLogger()
 

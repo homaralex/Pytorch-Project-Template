@@ -4,7 +4,7 @@ Mnist tutorial main model
 import torch.nn as nn
 import torch.nn.functional as F
 
-from graphs.models.base import BaseModel
+from pytorch_template.graphs.models.base import BaseModel
 from ..weights_initializer import weights_init
 
 
