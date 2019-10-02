@@ -9,19 +9,19 @@ import argparse
 
 import gin
 
-from pytorch_template import agents as agents_module
+from pytorch_template import agents as base_agents_module
 from pytorch_template.utils.config import process_gin_config
 
 
 @gin.configurable
-def make_agent(agent_name):
+def make_agent(agent_name, agents_module=base_agents_module):
     agent_class = getattr(agents_module, agent_name)
     agent = agent_class()
 
     return agent
 
 
-def main():
+def main(agents_module=None):
     parser = argparse.ArgumentParser(description="")
     parser.add_argument(
         'config',
@@ -39,7 +39,7 @@ def main():
     process_gin_config(config_file=args.config, gin_kwargs={'debug': args.debug})
 
     # create an Agent object and let it run its pipeline
-    agent = make_agent()
+    agent = make_agent(agents_module=agents_module)
     agent.run()
     agent.finalize()
 
