@@ -3,10 +3,10 @@ from logging import Formatter
 from logging.handlers import RotatingFileHandler
 from shutil import copyfile
 
-
 import gin
 
 from utils.dirs import make_exp_dirs, CHECKPOINTS_DIR_GIN_MACRO_NAME, TBOARD_DIR_GIN_MACRO_NAME
+from utils.repo import save_repo_archive
 
 
 def setup_logging(log_dir):
@@ -49,20 +49,26 @@ def process_gin_config(config_file, gin_kwargs: dict):
 
     # create some important directories to be used for that experiment
     summary_dir, checkpoints_dir, out_dir, log_dir = make_exp_dirs(exp_name=gin.REQUIRED)
-    _gin_add_kwargs({
-        CHECKPOINTS_DIR_GIN_MACRO_NAME: checkpoints_dir,
-        TBOARD_DIR_GIN_MACRO_NAME: summary_dir,
-    })
-    # copy the gin config file into the current run's directory
-    copyfile(config_file, checkpoints_dir / 'config.gin')
 
     # setup logging in the project
     setup_logging(log_dir)
     logger = logging.getLogger()
 
+    # make important paths available through the Gin config
+    _gin_add_kwargs({
+        CHECKPOINTS_DIR_GIN_MACRO_NAME: checkpoints_dir,
+        TBOARD_DIR_GIN_MACRO_NAME: summary_dir,
+    })
+
     logger.info(f"The experiment name is '{gin.query_parameter('%exp_name')}'")
     logger.info("Configuration:")
     logging.info(gin.config.config_str())
+
+    # copy the gin config file into the current run's directory
+    copyfile(config_file, checkpoints_dir / 'config.gin')
+    # save current repo state
+    save_repo_archive(filename=checkpoints_dir / 'repo.tar')
+    logger.info(f'Saved config and repo to {checkpoints_dir}.')
 
     logger.info("Configurations are successfully processed and dirs are created.")
     logger.info("The pipeline of the project will begin now.")
