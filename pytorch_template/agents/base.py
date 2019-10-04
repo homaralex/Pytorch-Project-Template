@@ -121,6 +121,9 @@ class BaseTrainAgent(BaseAgent):
 
     def _init_device(self):
         self.device = configure_device()
+        self._move_to_device()
+
+    def _move_to_device(self):
         self.model = self.model.to(self.device)
 
     def _init_tboard_logging(self):
