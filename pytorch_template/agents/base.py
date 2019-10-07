@@ -209,6 +209,7 @@ class BaseTrainAgent(BaseAgent):
             self.train()
         except KeyboardInterrupt:
             self.logger.info("You have entered CTRL+C.. Wait to finalize")
+            self.finalize()
 
     def train(self):
         """
