@@ -18,7 +18,7 @@ class MnistAgent(BaseTrainAgent):
 
     def _init_model(self):
         self.model = Mnist()
-        self.logger.info(f'Model architecture:\n{self.model}\nKeras-style summary:\n{self.model.summary()}')
+        self.logger.info(f'Model:\n{self.model}')
 
     def _init_data_loader(self):
         self.data_loader = MnistDataLoader()

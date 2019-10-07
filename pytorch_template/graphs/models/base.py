@@ -12,7 +12,8 @@ class BaseModel(nn.Module):
         """
         model_parameters = filter(lambda p: p.requires_grad, self.parameters())
         params = sum([np.prod(p.size()) for p in model_parameters])
-        return super().__str__() + '\nTrainable parameters: {}'.format(params)
+        return super().__str__() + '\nTrainable parameters: {}'.format(
+            params) + f'\nKeras-style summary:\n{self.summary()}'
 
     @property
     def name(self):
@@ -20,7 +21,10 @@ class BaseModel(nn.Module):
 
     @property
     def default_input_size(self):
-        raise NotImplementedError()
+        try:
+            return self._DEFAULT_INPUT_SIZE
+        except AttributeError:
+            raise NotImplementedError('Define _DEFAULT_INPUT_SIZE or override default_input_size')
 
     def summary(self, input_size=None, batch_size=-1, device="cuda"):
         """Based on https://github.com/sksq96/pytorch-summary"""
