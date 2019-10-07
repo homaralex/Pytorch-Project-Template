@@ -5,7 +5,8 @@ from shutil import copyfile
 
 import gin
 
-from pytorch_template.utils.dirs import make_exp_dirs, CHECKPOINTS_DIR_GIN_MACRO_NAME, TBOARD_DIR_GIN_MACRO_NAME
+from pytorch_template.utils.dirs import make_exp_dirs, CHECKPOINTS_DIR_GIN_MACRO_NAME, TBOARD_DIR_GIN_MACRO_NAME, \
+    OUT_DIR_GIN_MACRO_NAME, LOG_DIR_GIN_MACRO_NAME
 from pytorch_template.utils.repo import save_repo_archive
 
 
@@ -58,6 +59,8 @@ def process_gin_config(config_file, gin_kwargs: dict):
     _gin_add_kwargs({
         CHECKPOINTS_DIR_GIN_MACRO_NAME: checkpoints_dir,
         TBOARD_DIR_GIN_MACRO_NAME: summary_dir,
+        LOG_DIR_GIN_MACRO_NAME: log_dir,
+        OUT_DIR_GIN_MACRO_NAME: out_dir,
     })
 
     logger.info(f"The experiment name is '{gin.query_parameter('%exp_name')}'")
