@@ -30,7 +30,7 @@ def print_cuda_statistics():
         call(["nvcc", "--version"])
     except FileNotFoundError as e:
         logger.warning(e)
-    logger.info('__CUDNN VERSION:  {}'.format(torch.backends.cudnn.versionFileNotFoundError()))
+    logger.info('__CUDNN VERSION:  {}'.format(torch.backends.cudnn.version()))
     logger.info('__Number CUDA Devices:  {}'.format(torch.cuda.device_count()))
     logger.info('__Devices')
     call(["nvidia-smi", "--format=csv",
