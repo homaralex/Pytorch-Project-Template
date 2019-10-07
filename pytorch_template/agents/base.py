@@ -238,7 +238,7 @@ class BaseTrainAgent(BaseAgent):
         # log to tensorboard
         for scalar_name, scalar_val in scalars_to_log.items():
             self.summary_writer.add_scalar(
-                tag=f'{scalar_name}/train',
+                tag=f'train/{scalar_name}',
                 scalar_value=scalar_val,
                 global_step=self.current_iteration,
             )
@@ -272,25 +272,25 @@ class BaseTrainAgent(BaseAgent):
         :return:
         """
         self.model.eval()
-        val_loss = 0
+        loss = 0
         with torch.no_grad():
             for data, target in self.data_loader.val_loader:
                 data, target = data.to(self.device), target.to(self.device)
                 output = self.model(data)
                 # sum up batch loss
-                val_loss += self.loss_fn(output, target, size_average=False).item()
+                loss += self.loss_fn(output, target, size_average=False).item()
 
                 if self.debug:
                     break
 
-        val_loss /= len(self.data_loader.val_loader.dataset)
+        loss /= len(self.data_loader.val_loader.dataset)
 
-        self.logger.info(f'\nValidation set: Average loss: {val_loss:.4f}')
+        self.logger.info(f'\nValidation set: Average loss: {loss:.4f}')
 
         # log to tensorboard
         self.summary_writer.add_scalar(
-            tag='Loss/validation',
-            scalar_value=val_loss,
+            tag='validation/loss',
+            scalar_value=loss,
             global_step=self.current_epoch,
         )
 
