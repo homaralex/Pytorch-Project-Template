@@ -27,3 +27,7 @@ class Mnist(BaseModel):
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
+
+    @property
+    def default_input_size(self):
+        return 1, 28, 28
