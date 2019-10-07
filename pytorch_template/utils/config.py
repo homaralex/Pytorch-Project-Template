@@ -30,7 +30,10 @@ def setup_logging(log_dir):
     exp_errors_file_handler.setLevel(logging.WARNING)
     exp_errors_file_handler.setFormatter(Formatter(log_file_format))
 
-    main_logger.removeHandler(main_logger.handlers[0])
+    if len(main_logger.handlers) > 0:
+        # remove tensorboard-added unnecessary info handler
+        main_logger.removeHandler(main_logger.handlers[0])
+
     main_logger.addHandler(console_handler)
     main_logger.addHandler(exp_file_handler)
     main_logger.addHandler(exp_errors_file_handler)

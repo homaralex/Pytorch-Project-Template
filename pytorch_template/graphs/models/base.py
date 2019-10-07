@@ -26,13 +26,12 @@ class BaseModel(nn.Module):
         except AttributeError:
             raise NotImplementedError('Define _DEFAULT_INPUT_SIZE or override default_input_size')
 
-    def summary(self, input_size=None, batch_size=-1, device="cuda"):
+    def summary(self, input_size=None, batch_size=-1, device="cpu"):
         """Based on https://github.com/sksq96/pytorch-summary"""
 
         input_size = input_size or self.default_input_size
 
         def register_hook(module):
-
             def hook(module, input, output):
                 class_name = str(module.__class__).split(".")[-1].split("'")[0]
                 module_idx = len(summary)

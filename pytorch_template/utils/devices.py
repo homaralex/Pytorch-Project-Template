@@ -29,13 +29,12 @@ def configure_device(cuda, gpu_device=None, seed=None):
 
 def _set_device(use_cuda, gpu_device):
     if use_cuda:
-        device = torch.device("cuda")
-        torch.cuda.device(gpu_device)
-        logger.info("Program will run on *****GPU-CUDA***** ")
+        device = torch.device(f'cuda:{gpu_device}')
         print_cuda_statistics()
     else:
         device = torch.device("cpu")
-        logger.info("Program will run on *****CPU*****\n")
+
+    logger.info(f"Program will run on *****{device}*****\n")
 
     return device
 
