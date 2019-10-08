@@ -24,8 +24,18 @@ class BaseAgent:
 
     def _get_state_dict(self):
         return {
-            # TODO dump config here
+            'epoch': self.current_epoch,
+            'iteration': self.current_iteration,
+            'torch_random_state': torch.get_rng_state(),
+            'numpy_random_state': np.random.get_state(),
         }
+
+    def _load_state_dict(self, state_dict):
+        self.current_epoch = state_dict['epoch'] + 1
+        self.current_iteration = state_dict['iteration']
+
+        torch.set_rng_state(state_dict['torch_random_state'])
+        np.random.set_state(state_dict['numpy_random_state'])
 
     def load_checkpoint(self, file_name):
         """
@@ -141,24 +151,17 @@ class BaseTrainAgent(BaseAgent):
         state_dict = super()._get_state_dict()
 
         state_dict.update({
-            'epoch': self.current_epoch,
-            'iteration': self.current_iteration,
             'model_state_dict': self.model.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
-            'torch_random_state': torch.get_rng_state(),
-            'numpy_random_state': np.random.get_state(),
         })
 
         return state_dict
 
     def _load_state_dict(self, state_dict):
-        self.current_epoch = state_dict['epoch'] + 1
-        self.current_iteration = state_dict['iteration']
+        super()._load_state_dict(state_dict)
+
         self.model.load_state_dict(state_dict['model_state_dict'])
         self.optimizer.load_state_dict(state_dict['optimizer_state_dict'])
-
-        torch.set_rng_state(state_dict['torch_random_state'])
-        np.random.set_state(state_dict['numpy_random_state'])
 
     @property
     def checkpoints_dir(self):
