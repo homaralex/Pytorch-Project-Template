@@ -11,5 +11,5 @@ setup(
     version='1.0',
     packages=find_packages(),
     install_requires=parse_requirements(),
-    scripts=['scripts/clear_experiments.sh'],
+    scripts=['scripts/clear_experiments.sh', 'scripts/launch_tboard.sh'],
 )
