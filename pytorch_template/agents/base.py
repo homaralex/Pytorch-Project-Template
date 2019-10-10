@@ -229,12 +229,12 @@ class BaseTrainAgent(BaseAgent):
             if self.debug:
                 break
 
-    def _log_train_iter(self, batch_idx, **scalars_to_log):
+    def _log_train_iter(self, **scalars_to_log):
         self.logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]{}'.format(
             self.current_epoch,
-            batch_idx * self.data_loader.train_loader.batch_size,
+            self.current_iteration * self.data_loader.train_loader.batch_size,
             self.num_train_samples,
-            100. * batch_idx / len(self.data_loader.train_loader),
+            100. * self.current_iteration / len(self.data_loader.train_loader),
             ''.join(f'\t{k}: {v:.6f}' for k, v in scalars_to_log.items()),
         ))
 
@@ -262,7 +262,7 @@ class BaseTrainAgent(BaseAgent):
 
             if batch_idx % self.log_interval == 0:
                 loss_val = loss.item()
-                self._log_train_iter(batch_idx=batch_idx, loss=loss_val)
+                self._log_train_iter(iter_idx=batch_idx, loss=loss_val)
 
             self.current_iteration += 1
 
