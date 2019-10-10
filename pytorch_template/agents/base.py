@@ -234,7 +234,7 @@ class BaseTrainAgent(BaseAgent):
             self.current_epoch,
             self.current_iteration * self.data_loader.train_loader.batch_size,
             self.num_train_samples,
-            100. * self.current_iteration / len(self.data_loader.train_loader),
+            100. * self.current_iteration / self.num_train_batches,
             ''.join(f'\t{k}: {v:.6f}' for k, v in scalars_to_log.items()),
         ))
 
@@ -262,7 +262,7 @@ class BaseTrainAgent(BaseAgent):
 
             if batch_idx % self.log_interval == 0:
                 loss_val = loss.item()
-                self._log_train_iter(iter_idx=batch_idx, loss=loss_val)
+                self._log_train_iter(loss=loss_val)
 
             self.current_iteration += 1
 
@@ -311,3 +311,7 @@ class BaseTrainAgent(BaseAgent):
     @property
     def num_val_samples(self):
         return len(self.data_loader.val_loader.dataset)
+
+    @property
+    def num_train_batches(self):
+        return len(self.data_loader.train_loader)
