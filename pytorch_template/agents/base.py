@@ -232,7 +232,7 @@ class BaseTrainAgent(BaseAgent):
     def _log_train_iter(self, **scalars_to_log):
         self.logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]{}'.format(
             self.current_epoch,
-            self.current_iteration * self.data_loader.train_loader.batch_size,
+            self.current_iteration * self.dloader_train.batch_size,
             self.num_train_samples,
             100. * self.current_iteration / self.num_train_batches,
             ''.join(f'\t{k}: {v:.6f}' for k, v in scalars_to_log.items()),
@@ -252,7 +252,7 @@ class BaseTrainAgent(BaseAgent):
         :return:
         """
         self.model.train()
-        for batch_idx, (data, target) in enumerate(self.data_loader.train_loader):
+        for batch_idx, (data, target) in enumerate(self.dloader_train):
             data, target = data.to(self.device), target.to(self.device)
             self.optimizer.zero_grad()
             output = self.model(data)
@@ -277,7 +277,7 @@ class BaseTrainAgent(BaseAgent):
         self.model.eval()
         loss = 0
         with torch.no_grad():
-            for data, target in self.data_loader.val_loader:
+            for data, target in self.dloader_val:
                 data, target = data.to(self.device), target.to(self.device)
                 output = self.model(data)
                 # sum up batch loss
@@ -286,7 +286,7 @@ class BaseTrainAgent(BaseAgent):
                 if self.debug:
                     break
 
-        loss /= len(self.data_loader.val_loader.dataset)
+        loss /= len(self.dloader_val.dataset)
 
         self.logger.info(f'\nValidation set: Average loss: {loss:.4f}')
 
@@ -306,12 +306,12 @@ class BaseTrainAgent(BaseAgent):
 
     @property
     def num_train_samples(self):
-        return len(self.data_loader.train_loader.dataset)
+        return len(self.dloader_train.dataset)
 
     @property
     def num_val_samples(self):
-        return len(self.data_loader.val_loader.dataset)
+        return len(self.dloader_val.dataset)
 
     @property
     def num_train_batches(self):
-        return len(self.data_loader.train_loader)
+        return len(self.dloader_train)

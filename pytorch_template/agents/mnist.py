@@ -21,4 +21,5 @@ class MnistAgent(BaseTrainAgent):
         self.logger.info(f'Model:\n{self.model}')
 
     def _init_data_loader(self):
-        self.data_loader = MnistDataLoader()
+        data_loader = MnistDataLoader()
+        self.dloader_train, self.dloader_val = data_loader.train_loader, data_loader.val_loader
