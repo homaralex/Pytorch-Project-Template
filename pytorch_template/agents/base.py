@@ -230,11 +230,12 @@ class BaseTrainAgent(BaseAgent):
                 break
 
     def _log_train_iter(self, **scalars_to_log):
+        curr_epoch_iter = self.current_iteration % self.num_train_batches
         self.logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]{}'.format(
             self.current_epoch,
-            self.current_iteration * self.dloader_train.batch_size,
+            curr_epoch_iter * self.dloader_train.batch_size,
             self.num_train_samples,
-            100. * self.current_iteration / self.num_train_batches,
+            100. * curr_epoch_iter / self.num_train_batches,
             ''.join(f'\t{k}: {v:.6f}' for k, v in scalars_to_log.items()),
         ))
 
