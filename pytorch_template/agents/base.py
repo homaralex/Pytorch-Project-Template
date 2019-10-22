@@ -210,8 +210,10 @@ class BaseTrainAgent(BaseAgent):
         :return:
         """
         try:
+            # 'stack' is a dummy context manager
             with ExitStack() as stack:
                 if self.debug:
+                    # but if in debug mode add an actual manager for anomaly detection
                     stack.enter_context(torch.autograd.detect_anomaly())
                 self.train()
         except KeyboardInterrupt:
