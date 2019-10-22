@@ -1,42 +1,12 @@
 import logging
-from logging import Formatter
-from logging.handlers import RotatingFileHandler
 from shutil import copyfile
 
 import gin
 
 from pytorch_template.utils.dirs import make_exp_dirs, CHECKPOINTS_DIR_GIN_MACRO_NAME, TBOARD_DIR_GIN_MACRO_NAME, \
     OUT_DIR_GIN_MACRO_NAME, LOG_DIR_GIN_MACRO_NAME
+from pytorch_template.utils.logs import setup_logging
 from pytorch_template.utils.repo import save_repo_archive
-
-
-def setup_logging(log_dir):
-    log_file_format = "[%(levelname)s] - %(asctime)s - %(name)s - : %(message)s in %(pathname)s:%(lineno)d"
-    log_console_format = "[%(levelname)s]: %(message)s"
-
-    # Main logger
-    main_logger = logging.getLogger()
-    main_logger.setLevel(logging.INFO)
-
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
-    console_handler.setFormatter(Formatter(log_console_format))
-
-    exp_file_handler = RotatingFileHandler('{}exp_debug.log'.format(log_dir), maxBytes=10 ** 6, backupCount=5)
-    exp_file_handler.setLevel(logging.DEBUG)
-    exp_file_handler.setFormatter(Formatter(log_file_format))
-
-    exp_errors_file_handler = RotatingFileHandler('{}exp_error.log'.format(log_dir), maxBytes=10 ** 6, backupCount=5)
-    exp_errors_file_handler.setLevel(logging.WARNING)
-    exp_errors_file_handler.setFormatter(Formatter(log_file_format))
-
-    if len(main_logger.handlers) > 0:
-        # remove tensorboard-added unnecessary info handler
-        main_logger.removeHandler(main_logger.handlers[0])
-
-    main_logger.addHandler(console_handler)
-    main_logger.addHandler(exp_file_handler)
-    main_logger.addHandler(exp_errors_file_handler)
 
 
 def _gin_add_kwargs(gin_kwargs: dict):
