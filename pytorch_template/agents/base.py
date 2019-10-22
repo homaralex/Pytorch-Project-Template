@@ -2,6 +2,7 @@
 The Base Agent class, where all other agents inherit from, that contains definitions for all the necessary functions
 """
 import logging
+from contextlib import ExitStack
 
 import gin
 import numpy as np
@@ -209,7 +210,10 @@ class BaseTrainAgent(BaseAgent):
         :return:
         """
         try:
-            self.train()
+            with ExitStack() as stack:
+                if self.debug:
+                    stack.enter_context(torch.autograd.detect_anomaly())
+                self.train()
         except KeyboardInterrupt:
             self.logger.info("You have entered CTRL+C.. Wait to finalize")
             self.finalize()
