@@ -2,7 +2,7 @@ from pathlib import Path
 
 import gin
 
-from pytorch_template.utils.misc import get_datetime_str
+from pytorch_template.utils.misc import get_datetime_str, is_debug_mode
 
 _TBOARD_PATH = Path('tboard_logs')
 _EXPERIMENTS_PATH = Path('experiments')
@@ -43,7 +43,7 @@ def _get_timestamped_path(
 
 @gin.configurable
 def make_exp_dirs(exp_name):
-    timestamp = get_datetime_str()
+    timestamp = 'debug' if is_debug_mode() else get_datetime_str()
 
     return (
         # tboard

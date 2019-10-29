@@ -12,6 +12,7 @@ from torch.utils.tensorboard import SummaryWriter
 from pytorch_template.graphs.optimizers import sgd
 from pytorch_template.utils import dirs as module_dirs
 from pytorch_template.utils.devices import configure_device
+from pytorch_template.utils.misc import is_debug_mode
 
 
 class BaseAgent:
@@ -91,7 +92,7 @@ class BaseAgent:
 
     @property
     def debug(self):
-        return gin.query_parameter('%debug')
+        return is_debug_mode()
 
 
 @gin.configurable

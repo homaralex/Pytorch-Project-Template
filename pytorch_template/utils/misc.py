@@ -2,6 +2,8 @@ import datetime
 import logging
 import time
 
+import gin
+
 
 def timeit(f):
     """ Decorator to time Any Function """
@@ -41,3 +43,7 @@ def print_cuda_statistics():
 
 def get_datetime_str():
     return datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+
+def is_debug_mode():
+    return gin.query_parameter('%debug')
