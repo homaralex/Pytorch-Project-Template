@@ -2,8 +2,8 @@ exp_name = 'mnist_exp_0'
 
 make_exp_dirs.exp_name = %exp_name
 
-configure_device.cuda = True
-configure_device.gpu_device = 0
+gpu_id = 2
+# configure_device.gpu_id = %gpu_id
 configure_device.seed = 1
 
 make_agent.agent_name = 'MnistAgent'

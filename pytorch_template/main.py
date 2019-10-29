@@ -34,9 +34,15 @@ def main(agents_module=None, debug=False):
         # default value specified for fast in-code changes
         default=False or debug,
     )
+    parser.add_argument(
+        '-g',
+        '--gpu_id',
+        type=int,
+        default=None,
+    )
     args = parser.parse_args()
 
-    process_gin_config(config_file=args.config, gin_kwargs={'debug': args.debug})
+    process_gin_config(config_file=args.config, gin_macros={'debug': args.debug, 'gpu_id': args.gpu_id})
 
     # create an Agent object and let it run its pipeline
     agent = make_agent(agents_module=agents_module)

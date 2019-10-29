@@ -9,15 +9,18 @@ from pytorch_template.utils.logs import setup_logging
 from pytorch_template.utils.repo import save_repo_archive
 
 
-def _gin_add_kwargs(gin_kwargs: dict):
+def _gin_add_macros(gin_macros: dict):
     """Updates the gin config by adding the passed values as gin macros."""
-    for key, val in gin_kwargs.items():
+    for key, val in gin_macros.items():
         gin.bind_parameter(binding_key=f'%{key}', value=val)
 
 
-def process_gin_config(config_file, gin_kwargs: dict):
+def process_gin_config(config_file, gin_macros: dict):
     # add custom values not provided in the config file as macros
-    _gin_add_kwargs(gin_kwargs)
+    _gin_add_macros(gin_macros)
+
+    # TODO not the cleanest way
+    gin.bind_parameter('configure_device.gpu_id', gin.query_parameter('%gpu_id'))
 
     gin.parse_config_file(config_file=config_file)
 
@@ -29,7 +32,7 @@ def process_gin_config(config_file, gin_kwargs: dict):
     logger = logging.getLogger()
 
     # make important paths available through the Gin config
-    _gin_add_kwargs({
+    _gin_add_macros({
         CHECKPOINTS_DIR_GIN_MACRO_NAME: checkpoints_dir,
         TBOARD_DIR_GIN_MACRO_NAME: summary_dir,
         LOG_DIR_GIN_MACRO_NAME: log_dir,
