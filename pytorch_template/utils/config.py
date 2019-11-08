@@ -15,9 +15,9 @@ def _gin_add_macros(gin_macros: dict):
         gin.bind_parameter(binding_key=f'%{key}', value=val)
 
 
-def process_gin_config(config_file, gin_macros: dict):
+def process_gin_config(config_file, gin_macros: dict = None):
     # add custom values not provided in the config file as macros
-    _gin_add_macros(gin_macros)
+    _gin_add_macros(gin_macros or {})
 
     # TODO not the cleanest way
     gin.bind_parameter('configure_device.gpu_id', gin.query_parameter('%gpu_id'))
