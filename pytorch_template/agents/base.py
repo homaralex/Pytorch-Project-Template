@@ -186,7 +186,7 @@ class BaseTrainAgent(BaseAgent):
 
             self.logger.info(f'Loading checkpoint "{checkpoint_path}"')
 
-            checkpoint = torch.load(checkpoint_path)
+            checkpoint = torch.load(checkpoint_path, map_location=self.device)
             self._load_state_dict(checkpoint)
 
             self.logger.info(
