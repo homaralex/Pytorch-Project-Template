@@ -36,7 +36,7 @@ class BaseAgent:
         self.current_epoch = state_dict['epoch'] + 1
         self.current_iteration = state_dict['iteration']
 
-        torch.set_rng_state(state_dict['torch_random_state'])
+        torch.set_rng_state(state_dict['torch_random_state'].cpu())
         np.random.set_state(state_dict['numpy_random_state'])
 
     def load_checkpoint(self, file_name):
