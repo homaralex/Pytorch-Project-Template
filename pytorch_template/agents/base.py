@@ -228,8 +228,8 @@ class BaseTrainAgent(BaseAgent):
         """
         for epoch in range(self.current_epoch, self.max_epoch):
             self.train_one_epoch()
-            self.validate()
-            self.save_checkpoint()
+            is_best = self.validate() or False
+            self.save_checkpoint(is_best=is_best)
 
             self.current_epoch += 1
 
