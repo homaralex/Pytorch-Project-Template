@@ -15,7 +15,7 @@ def _gin_add_macros(gin_macros: dict):
         gin.bind_parameter(binding_key=f'%{key}', value=val)
 
 
-def process_gin_config(config_file, gin_macros: dict = None):
+def process_gin_config(config_file, gin_macros: dict = None, save_repo=True):
     # add custom values not provided in the config file as macros
     _gin_add_macros(gin_macros or {})
 
@@ -46,7 +46,8 @@ def process_gin_config(config_file, gin_macros: dict = None):
     # copy the gin config file into the current run's directory
     copyfile(config_file, checkpoints_dir / 'config.gin')
     # save current repo state
-    save_repo_archive(filename=checkpoints_dir / 'repo.tar')
+    if save_repo:
+        save_repo_archive(filename=checkpoints_dir / 'repo.tar')
     logger.info(f'Saved config and repo to {checkpoints_dir}.')
 
     logger.info("Configurations are successfully processed and dirs are created.")
