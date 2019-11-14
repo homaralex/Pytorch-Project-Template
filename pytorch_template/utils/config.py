@@ -2,6 +2,7 @@ import logging
 from shutil import copyfile
 
 import gin
+from git import InvalidGitRepositoryError
 
 from pytorch_template.utils.dirs import make_exp_dirs, CHECKPOINTS_DIR_GIN_MACRO_NAME, TBOARD_DIR_GIN_MACRO_NAME, \
     OUT_DIR_GIN_MACRO_NAME, LOG_DIR_GIN_MACRO_NAME
@@ -15,7 +16,7 @@ def _gin_add_macros(gin_macros: dict):
         gin.bind_parameter(binding_key=f'%{key}', value=val)
 
 
-def process_gin_config(config_file, gin_macros: dict = None, save_repo=True):
+def process_gin_config(config_file, gin_macros: dict = None):
     # add custom values not provided in the config file as macros
     _gin_add_macros(gin_macros or {})
 
@@ -45,10 +46,14 @@ def process_gin_config(config_file, gin_macros: dict = None, save_repo=True):
 
     # copy the gin config file into the current run's directory
     copyfile(config_file, checkpoints_dir / 'config.gin')
+    logger.info(f'Saved config to {checkpoints_dir}.')
+
     # save current repo state
-    if save_repo:
+    try:
         save_repo_archive(filename=checkpoints_dir / 'repo.tar')
-    logger.info(f'Saved config and repo to {checkpoints_dir}.')
+        logger.info(f'Saved repo to {checkpoints_dir}.')
+    except InvalidGitRepositoryError as e:
+        logger.info(f'Could not save repo. GitPython error:\n{e}.')
 
     logger.info("Configurations are successfully processed and dirs are created.")
     logger.info("The pipeline of the project will begin now.")
