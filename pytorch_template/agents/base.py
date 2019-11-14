@@ -3,6 +3,7 @@ The Base Agent class, where all other agents inherit from, that contains definit
 """
 import logging
 from contextlib import ExitStack
+from pathlib import Path
 
 import gin
 import numpy as np
@@ -181,8 +182,9 @@ class BaseTrainAgent(BaseAgent):
         :param file_name: name of the checkpoint file
         :return:
         """
-        if file_name is not None and len(file_name) > 0:
-            checkpoint_path = self.experiments_dir / file_name
+        if file_name is not None and len(str(file_name)) > 0:
+            file_name = Path(file_name)
+            checkpoint_path = file_name if file_name.is_absolute() else self.experiments_dir / file_name
 
             self.logger.info(f'Loading checkpoint "{checkpoint_path}"')
 
