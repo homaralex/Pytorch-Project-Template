@@ -53,7 +53,7 @@ def process_gin_config(config_file, gin_macros: dict = None):
         save_repo_archive(filename=checkpoints_dir / 'repo.tar')
         logger.info(f'Saved repo to {checkpoints_dir}.')
     except InvalidGitRepositoryError as e:
-        logger.info(f'Could not save repo. GitPython error:\n{e}.')
+        logger.warning(f'Could not save repo. GitPython error:\n{e}.')
 
     logger.info("Configurations are successfully processed and dirs are created.")
     logger.info("The pipeline of the project will begin now.")
