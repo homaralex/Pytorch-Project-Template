@@ -46,4 +46,7 @@ def get_datetime_str():
 
 
 def is_debug_mode():
-    return gin.query_parameter('%debug')
+    try:
+        return gin.query_parameter('%debug')
+    except ValueError:
+        return False
