@@ -6,6 +6,7 @@ finally instantiates an Agent object which then launches its pipeline.
 """
 
 import argparse
+import os
 
 import gin
 
@@ -43,6 +44,9 @@ def main(agents_module=None, debug=False):
     args = parser.parse_args()
 
     process_gin_config(config_file=args.config, gin_macros={'debug': args.debug, 'gpu_id': args.gpu_id})
+
+    # make sure gpu ordering is consistent with nvidia-smi output
+    os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
 
     # create an Agent object and let it run its pipeline
     agent = make_agent(agents_module=agents_module)
