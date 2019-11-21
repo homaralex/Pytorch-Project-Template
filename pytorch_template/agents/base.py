@@ -102,6 +102,7 @@ class BaseTrainAgent(BaseAgent):
             self,
             max_epoch,
             log_interval=10,
+            save_interval=100,
             checkpoint_path=None,
     ):
         super().__init__()
@@ -109,6 +110,7 @@ class BaseTrainAgent(BaseAgent):
         self.agent_name = 'BaseTrainAgent'
         self.max_epoch = max_epoch
         self.log_interval = log_interval
+        self.save_interval = save_interval
 
         self._init_counters()
         self._init_model()
@@ -201,11 +203,19 @@ class BaseTrainAgent(BaseAgent):
         :param is_best: boolean flag to indicate whether current checkpoint's accuracy is the best so far
         :return:
         """
-        checkpoint_path = self.checkpoints_dir / f'epoch_{self.current_epoch}.pth'
-        torch.save(self._get_state_dict(), checkpoint_path)
+        state_dict = self._get_state_dict()
+
+        # save as last iteration
+        checkpoint_path = self.checkpoints_dir / f'last.pth'
+        torch.save(state_dict, checkpoint_path)
+
+        if self.current_iteration % self.save_interval == 0:
+            checkpoint_path = self.checkpoints_dir / f'epoch_{self.current_epoch}.pth'
+            torch.save(state_dict, checkpoint_path)
+
         if is_best:
             best_checkpoint_path = self.checkpoints_dir / 'best.pth'
-            torch.save(self._get_state_dict(), best_checkpoint_path)
+            torch.save(state_dict, best_checkpoint_path)
 
     def run(self):
         """
