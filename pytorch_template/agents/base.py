@@ -100,7 +100,7 @@ class BaseAgent:
 class BaseTrainAgent(BaseAgent):
     def __init__(
             self,
-            max_epoch,
+            max_epoch=None,
             max_iter=None,
             log_interval=10,
             save_interval=100,
@@ -109,6 +109,7 @@ class BaseTrainAgent(BaseAgent):
         super().__init__()
 
         self.agent_name = 'BaseTrainAgent'
+        assert max_epoch or max_iter, "Either 'max_epoch' or 'max_iter' argument must be provided for BaseTrainAgent"
         self._max_epoch = max_epoch
         self.max_iter = max_iter
         self.log_interval = log_interval
