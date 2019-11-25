@@ -101,6 +101,7 @@ class BaseTrainAgent(BaseAgent):
     def __init__(
             self,
             max_epoch,
+            max_iter=None,
             log_interval=10,
             save_interval=100,
             checkpoint_path=None,
@@ -108,7 +109,8 @@ class BaseTrainAgent(BaseAgent):
         super().__init__()
 
         self.agent_name = 'BaseTrainAgent'
-        self.max_epoch = max_epoch
+        self._max_epoch = max_epoch
+        self.max_iter = max_iter
         self.log_interval = log_interval
         self.save_interval = save_interval
 
@@ -250,8 +252,9 @@ class BaseTrainAgent(BaseAgent):
 
     def _log_train_iter(self, **scalars_to_log):
         curr_epoch_iter = self.current_iteration % self.num_train_batches
-        self.logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]{}'.format(
+        self.logger.info('Train Epoch: {}/{} [{}/{} ({:.0f}%)]{}'.format(
             self.current_epoch,
+            self.max_epoch,
             curr_epoch_iter * self.dloader_train.batch_size,
             self.num_train_samples,
             100. * curr_epoch_iter / self.num_train_batches,
@@ -335,3 +338,9 @@ class BaseTrainAgent(BaseAgent):
     @property
     def num_train_batches(self):
         return len(self.dloader_train)
+
+    @property
+    def max_epoch(self):
+        if self.max_iter is not None:
+            return int(self.max_iter / self.num_train_batches)
+        return self._max_epoch
