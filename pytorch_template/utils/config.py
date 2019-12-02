@@ -44,8 +44,8 @@ def process_gin_config(config_file, gin_macros: dict = None):
     logger.info("Configuration:")
     logging.info(gin.config.config_str())
 
-    # copy the gin config file into the current run's directory
-    copyfile(config_file, checkpoints_dir / 'config.gin')
+    # save the whole gin config into the current run's directory
+    print(gin.config.config_str(), file=(checkpoints_dir / 'config.gin').open(mode='w'))
     logger.info(f'Saved config to {checkpoints_dir}.')
 
     # save current repo state
