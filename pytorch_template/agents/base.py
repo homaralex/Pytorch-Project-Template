@@ -212,7 +212,7 @@ class BaseTrainAgent(BaseAgent):
         checkpoint_path = self.checkpoints_dir / f'last.pth'
         torch.save(state_dict, checkpoint_path)
 
-        if self.current_iteration % self.save_interval == 0:
+        if self.current_epoch % self.save_interval == 0:
             checkpoint_path = self.checkpoints_dir / f'epoch_{self.current_epoch}.pth'
             torch.save(state_dict, checkpoint_path)
 
