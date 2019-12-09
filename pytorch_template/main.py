@@ -36,6 +36,12 @@ def main(agents_module=None, debug=False):
         default=False or debug,
     )
     parser.add_argument(
+        '--detect_anomaly',
+        action='store_true',
+        # default value specified for fast in-code changes
+        default=False,
+    )
+    parser.add_argument(
         '-g',
         '--gpu_id',
         type=int,
@@ -43,7 +49,11 @@ def main(agents_module=None, debug=False):
     )
     args = parser.parse_args()
 
-    process_gin_config(config_file=args.config, gin_macros={'debug': args.debug, 'gpu_id': args.gpu_id})
+    process_gin_config(config_file=args.config, gin_macros={
+        'debug': args.debug,
+        'gpu_id': args.gpu_id,
+        'detect_anomaly': args.detect_anomaly,
+    })
 
     # make sure gpu ordering is consistent with nvidia-smi output
     os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'

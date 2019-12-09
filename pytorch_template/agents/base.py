@@ -97,7 +97,6 @@ class BaseAgent:
 
     @property
     def detect_anomaly(self):
-        print(is_detect_anomaly_mode())
         return is_detect_anomaly_mode()
 
 
