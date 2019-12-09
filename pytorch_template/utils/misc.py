@@ -50,3 +50,10 @@ def is_debug_mode():
         return gin.query_parameter('%debug')
     except ValueError:
         return False
+
+
+def is_detect_anomaly_mode():
+    try:
+        return gin.query_parameter('%detect_anomaly')
+    except ValueError:
+        return False

@@ -13,7 +13,7 @@ from torch.utils.tensorboard import SummaryWriter
 from pytorch_template.graphs.optimizers import sgd
 from pytorch_template.utils import dirs as module_dirs
 from pytorch_template.utils.devices import configure_device
-from pytorch_template.utils.misc import is_debug_mode
+from pytorch_template.utils.misc import is_debug_mode, is_detect_anomaly_mode
 
 
 class BaseAgent:
@@ -94,6 +94,11 @@ class BaseAgent:
     @property
     def debug(self):
         return is_debug_mode()
+
+    @property
+    def detect_anomaly(self):
+        print(is_detect_anomaly_mode())
+        return is_detect_anomaly_mode()
 
 
 @gin.configurable
@@ -228,7 +233,7 @@ class BaseTrainAgent(BaseAgent):
         try:
             # 'stack' is a dummy context manager
             with ExitStack() as stack:
-                if self.debug:
+                if self.debug or self.detect_anomaly:
                     # but if in debug mode add an actual manager for anomaly detection
                     stack.enter_context(torch.autograd.detect_anomaly())
                 self.train()
