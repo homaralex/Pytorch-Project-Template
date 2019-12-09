@@ -22,7 +22,7 @@ def make_agent(agent_name, agents_module):
     return agent
 
 
-def main(agents_module=None, debug=False):
+def main(agents_module=None, debug=False, detect_anomaly=False):
     parser = argparse.ArgumentParser(description="")
     parser.add_argument(
         'config',
@@ -39,7 +39,7 @@ def main(agents_module=None, debug=False):
         '--detect_anomaly',
         action='store_true',
         # default value specified for fast in-code changes
-        default=False,
+        default=False or detect_anomaly,
     )
     parser.add_argument(
         '-g',
