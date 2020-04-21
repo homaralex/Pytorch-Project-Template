@@ -1,5 +1,5 @@
 import logging
-from shutil import copyfile
+from pathlib import Path
 
 import gin
 from git import InvalidGitRepositoryError
@@ -23,7 +23,25 @@ def process_gin_config(config_file, gin_macros: dict = None):
     # TODO not the cleanest way
     gin.bind_parameter('configure_device.gpu_id', gin.query_parameter('%gpu_id'))
 
-    gin.parse_config_file(config_file=config_file)
+    def clean_config_str(config_str):
+        while True:
+            posix_path_idx = config_str.find('PosixPath')
+            if posix_path_idx == -1:
+                break
+
+            # cut out the right parenthesis of "PosixPath('...')
+            r_part = config_str[posix_path_idx + 10:]
+            next_r_parenthesis_idx = r_part[1:].find("'") + 2
+            r_part = r_part[:next_r_parenthesis_idx] + r_part[next_r_parenthesis_idx + 1:]
+
+            # cut out "PosixPath("
+            config_str = config_str[:posix_path_idx] + r_part
+
+        return config_str
+
+    config_str = Path(config_file).read_text()
+    config_str = clean_config_str(config_str)
+    gin.parse_config(config_str)
 
     # create some important directories to be used for that experiment
     summary_dir, checkpoints_dir, out_dir, log_dir = make_exp_dirs(exp_name=gin.REQUIRED)
