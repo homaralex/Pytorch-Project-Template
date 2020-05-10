@@ -17,12 +17,6 @@ def _gin_add_macros(gin_macros: dict):
 
 
 def process_gin_config(config_file, gin_macros: dict = None):
-    # add custom values not provided in the config file as macros
-    _gin_add_macros(gin_macros or {})
-
-    # TODO not the cleanest way
-    gin.bind_parameter('configure_device.gpu_id', gin.query_parameter('%gpu_id'))
-
     def clean_config_str(config_str):
         while True:
             posix_path_idx = config_str.find('PosixPath')
@@ -42,6 +36,12 @@ def process_gin_config(config_file, gin_macros: dict = None):
     config_str = Path(config_file).read_text()
     config_str = clean_config_str(config_str)
     gin.parse_config(config_str)
+
+    # add custom values not provided in the config file as macros
+    _gin_add_macros(gin_macros or {})
+
+    # TODO not the cleanest way
+    gin.bind_parameter('configure_device.gpu_id', gin.query_parameter('%gpu_id'))
 
     # create some important directories to be used for that experiment
     summary_dir, checkpoints_dir, out_dir, log_dir = make_exp_dirs(exp_name=gin.REQUIRED)
